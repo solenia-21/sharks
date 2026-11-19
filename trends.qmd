@@ -1,0 +1,26 @@
+---
+title: "Trends"
+---
+
+```{r}
+#| message: false
+library(tidyverse)
+```
+
+```{r}
+attacks <- read_rds("data/attacks.rds")
+```
+
+```{r}
+attacks |>
+  filter(!is.na(Activity), Fatal_clean != "Unknown") |>
+  count(Activity, Fatal_clean, name = "attacks") |>
+  group_by(Activity) |>
+  filter(sum(attacks) >= 50) |>
+  ungroup() |>
+  mutate(Activity = fct_reorder(Activity, attacks, .fun = sum)) |>
+  ggplot(aes(x = Activity, y = attacks, fill = Fatal_clean)) +
+  geom_col() +
+  coord_flip() +
+  labs(x = "Activity", y = "Shark attacks", fill = "Outcome")
+```
